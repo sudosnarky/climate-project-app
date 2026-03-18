@@ -20,6 +20,7 @@ export default function ExperimentPhaseComponent({
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   const activeIndex = hoveredIndex ?? selectedIndex;
+  const canProceed = selectedIndex !== null && !disabled;
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-black px-6 pt-20 pb-8">
@@ -59,8 +60,8 @@ export default function ExperimentPhaseComponent({
                 activeIndex === null
                   ? 'border-neon-green text-white hover:bg-neon-green hover:text-black focus:ring-neon-green'
                   : activeIndex === index
-                    ? 'border-neon-cyan bg-neon-cyan text-black focus:ring-neon-cyan shadow-[0_0_30px_rgba(0,255,255,0.25)]'
-                    : 'border-gray-700 text-gray-500 opacity-20 pointer-events-none'
+                    ? 'border-neon-green bg-neon-green text-black focus:ring-neon-green shadow-[0_0_20px_rgba(15,255,80,0.25)]'
+                    : 'border-gray-900 bg-black text-gray-700 opacity-100'
               }`}
               aria-label={`Option: ${option.label}`}
               aria-pressed={selectedIndex === index}
@@ -83,8 +84,12 @@ export default function ExperimentPhaseComponent({
               onNext(selectedIndex);
             }
           }}
-          disabled={disabled || selectedIndex === null}
-          className="mt-8 w-full px-8 py-4 bg-neon-green text-black font-bold text-lg rounded-lg hover:bg-neon-cyan transition-all duration-200 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-neon-green focus:ring-offset-2 focus:ring-offset-black"
+          disabled={!canProceed}
+          className={`mt-8 w-full px-8 py-4 font-bold text-lg rounded-lg transition-all duration-200 active:scale-95 focus:outline-none focus:ring-2 focus:ring-neon-green focus:ring-offset-2 focus:ring-offset-black ${
+            canProceed
+              ? 'bg-neon-green text-black hover:bg-neon-cyan'
+              : 'bg-black text-neon-green border-2 border-neon-green/70 cursor-not-allowed'
+          }`}
           aria-label="Go to next question"
         >
           Next
