@@ -58,10 +58,10 @@ export default function ExperimentPhaseComponent({
               disabled={disabled}
               className={`w-full p-6 md:p-8 border-2 rounded-lg transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black text-left ${
                 activeIndex === null
-                  ? 'border-neon-green text-white hover:bg-neon-green hover:text-black focus:ring-neon-green'
+                  ? 'border-neon-green text-white focus:ring-neon-green'
                   : activeIndex === index
-                    ? 'border-neon-green bg-neon-green text-black focus:ring-neon-green shadow-[0_0_20px_rgba(15,255,80,0.25)]'
-                    : 'border-gray-900 bg-black text-gray-700 opacity-100'
+                    ? 'border-neon-green text-white focus:ring-neon-green'
+                    : 'border-gray-900 bg-black text-gray-700 opacity-50'
               }`}
               aria-label={`Option: ${option.label}`}
               aria-pressed={selectedIndex === index}
