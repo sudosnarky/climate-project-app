@@ -20,7 +20,8 @@ export default function ExperimentPhaseComponent({
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   const activeIndex = hoveredIndex ?? selectedIndex;
-  const canProceed = selectedIndex !== null && !disabled;
+  const hasSelection = selectedIndex !== null;
+  const canProceed = hasSelection && !disabled;
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-black px-6 pt-20 pb-8">
@@ -80,15 +81,17 @@ export default function ExperimentPhaseComponent({
 
         <button
           onClick={() => {
-            if (selectedIndex !== null) {
+            if (canProceed && selectedIndex !== null) {
               onNext(selectedIndex);
             }
           }}
-          disabled={!canProceed}
+          aria-disabled={!canProceed}
           className={`mt-8 w-full px-8 py-4 font-bold text-lg rounded-lg transition-all duration-200 active:scale-95 focus:outline-none focus:ring-2 focus:ring-neon-green focus:ring-offset-2 focus:ring-offset-black ${
             canProceed
-              ? 'bg-neon-green text-black hover:bg-neon-cyan'
-              : 'bg-black text-neon-green border-2 border-neon-green/70 cursor-not-allowed'
+              ? 'bg-white text-black hover:bg-gray-200'
+              : hasSelection
+                ? 'bg-white text-black cursor-wait'
+                : 'bg-white text-black cursor-not-allowed'
           }`}
           aria-label="Go to next question"
         >
