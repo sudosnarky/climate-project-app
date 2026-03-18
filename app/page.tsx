@@ -9,6 +9,7 @@ import ResultReveal from '@/components/ResultReveal';
 import DataVisualization from '@/components/DataVisualization';
 import WhyThisMatters from '@/components/WhyThisMatters';
 import FinalScreen from '@/components/FinalScreen';
+import ThankYouScreen from '@/components/ThankYouScreen';
 import { AppState, UserResponse, AllPhaseResults } from '@/lib/types';
 import { PHASES, SCREEN_ORDER } from '@/lib/data';
 import { addResponse, subscribeToResults } from '@/lib/firebase';
@@ -126,12 +127,16 @@ export default function Home() {
     [appState, goToNextScreen]
   );
 
+  const completeExperiment = useCallback(() => {
+    setAppState((prev) => ({ ...prev, currentScreen: 'thank-you' }));
+  }, []);
+
   if (!appState) {
     return null;
   }
 
   // Show progress bar on all screens except landing and final
-  const showProgress = !['landing', 'final'].includes(appState.currentScreen);
+  const showProgress = !['landing', 'final', 'thank-you'].includes(appState.currentScreen);
   const progressStep = getProgressStep();
 
   // Render current screen
@@ -205,7 +210,11 @@ export default function Home() {
       )}
 
       {appState.currentScreen === 'final' && (
-        <FinalScreen />
+        <FinalScreen onFinalize={completeExperiment} />
+      )}
+
+      {appState.currentScreen === 'thank-you' && (
+        <ThankYouScreen />
       )}
     </main>
   );

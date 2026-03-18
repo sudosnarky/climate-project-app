@@ -2,8 +2,21 @@
 
 import { useState } from 'react';
 
-export default function FinalScreen() {
+interface FinalScreenProps {
+  onFinalize: () => void;
+}
+
+export default function FinalScreen({ onFinalize }: FinalScreenProps) {
   const [reflection, setReflection] = useState<'yes' | 'no' | null>(null);
+
+  const handleReflection = (value: 'yes' | 'no') => {
+    if (reflection) return;
+    setReflection(value);
+
+    setTimeout(() => {
+      onFinalize();
+    }, 220);
+  };
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-black px-6">
@@ -33,22 +46,24 @@ export default function FinalScreen() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <button
-              onClick={() => setReflection('yes')}
+              onClick={() => handleReflection('yes')}
               className={`px-6 py-3 rounded-lg font-semibold transition-all duration-200 active:scale-95 focus:outline-none focus:ring-2 focus:ring-neon-green focus:ring-offset-2 focus:ring-offset-black ${
                 reflection === 'yes'
                   ? 'bg-neon-green text-black'
                   : 'bg-white text-black hover:bg-gray-200'
               }`}
+              disabled={Boolean(reflection)}
             >
               Yes
             </button>
             <button
-              onClick={() => setReflection('no')}
+              onClick={() => handleReflection('no')}
               className={`px-6 py-3 rounded-lg font-semibold transition-all duration-200 active:scale-95 focus:outline-none focus:ring-2 focus:ring-neon-cyan focus:ring-offset-2 focus:ring-offset-black ${
                 reflection === 'no'
                   ? 'bg-neon-cyan text-black'
                   : 'bg-gray-800 text-white hover:bg-gray-700'
               }`}
+              disabled={Boolean(reflection)}
             >
               No
             </button>
@@ -56,9 +71,7 @@ export default function FinalScreen() {
 
           {reflection && (
             <p className="text-sm text-gray-400 mt-5 animate-fadeIn">
-              {reflection === 'yes'
-                ? 'You noticed your decision pattern shift. Awareness is the first condition for better climate judgment.'
-                : 'Your responses remained stable. Stable patterns are data, too, and they shape collective outcomes.'}
+              Loading final screen...
             </p>
           )}
         </div>

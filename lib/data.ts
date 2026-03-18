@@ -78,4 +78,5 @@ export const SCREEN_ORDER = [
   'results',
   'why-matters',
   'final',
+  'thank-you',
 ];

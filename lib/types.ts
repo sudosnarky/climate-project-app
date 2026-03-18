@@ -33,7 +33,8 @@ export interface AppState {
     | 'phase3-reveal'
     | 'results'
     | 'why-matters'
-    | 'final';
+    | 'final'
+    | 'thank-you';
   userResponses: UserResponse[];
   sessionId: string;
   startTime: number;
