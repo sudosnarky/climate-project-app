@@ -32,6 +32,7 @@ export interface AppState {
     | 'phase3'
     | 'phase3-reveal'
     | 'results'
+    | 'why-matters'
     | 'final';
   userResponses: UserResponse[];
   sessionId: string;

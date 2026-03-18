@@ -3,58 +3,58 @@ import { ExperimentPhase } from './types';
 export const PHASES: ExperimentPhase[] = [
   {
     id: 'phase1',
-    question: 'The Future of Money',
-    description: 'Choose your reward:',
+    question: 'Decision 1: Time and Reward',
+    description: 'Record your response:',
     options: [
       {
         label: '₹500 today',
         value: 'immediate',
         explanation:
-          'You chose immediate gratification. This bias—temporal discounting—delays climate action globally. We prioritize short-term comfort over long-term survival.',
+          'Temporal Discounting: You favored immediate reward, a bias where future outcomes are undervalued. This decision pattern contributes to delayed climate action by prioritizing short-term comfort over long-term stability.',
       },
       {
         label: '₹2000 in 1 year',
         value: 'delayed',
         explanation:
-          'You chose delayed gratification. Yet most humans choose the immediate reward. This same bias drives inaction on climate: we ignore future catastrophe for present convenience.',
+          'Temporal Discounting Resistance: You prioritized long-term value over immediate payoff, countering a common bias. Climate progress depends on this same pattern: accepting present tradeoffs to prevent future damage.',
       },
     ],
   },
   {
     id: 'phase2',
-    question: 'What Threatens Us Most?',
-    description: 'Select the greater danger:',
+    question: 'Decision 2: Visible vs Invisible Risk',
+    description: 'Choose the threat that feels most urgent:',
     options: [
       {
         label: 'Visible Disasters (Floods)',
         value: 'visible',
         explanation:
-          'Floods are dramatic and visible. But gradual CO₂ rise is slower, invisible, harder to fear. We evolved to fear what we see. Climate change is silent.',
+          'Availability Heuristic: You prioritized a vivid, visible threat, where immediate events feel more dangerous than abstract risks. This bias can underweight slow climate drivers like rising CO2 that are less visible but globally destabilizing.',
       },
       {
         label: 'Invisible Threats (CO₂)',
         value: 'invisible',
         explanation:
-          'You recognized the slow catastrophe. Yet most people worry about disasters, not invisible gases. Our brains are wired to ignore creeping threats.',
+          'Availability Heuristic Resistance: You recognized a low-visibility threat despite weaker emotional cues. Climate action improves when decisions focus on systemic risk, not only what is most visually dramatic.',
       },
     ],
   },
   {
     id: 'phase3',
-    question: 'Who Bears Responsibility?',
-    description: 'Where should the blame fall?',
+    question: 'Decision 3: Responsibility Attribution',
+    description: 'Assign primary responsibility:',
     options: [
       {
         label: 'Individuals',
         value: 'individuals',
         explanation:
-          'Many think individual choices matter most. But here is the truth: just 100 corporations produce 71% of global emissions since 1988. The system, not you, is the problem.',
+          'Attribution Bias: You assigned responsibility at the individual level, a pattern where personal action is overweighted relative to structural forces. In climate behavior, this can dilute pressure on major institutional emitters and policy levers.',
       },
       {
         label: 'Corporations & Governments',
         value: 'systems',
         explanation:
-          'You understood the structural reality. Yet this knowledge is suppressed by narratives of personal responsibility. Blame is a distraction from accountability.',
+          'Attribution Bias Resistance: You prioritized systemic responsibility, aligning with emissions concentration across institutions. Climate outcomes improve when accountability tracks where decision power and emissions scale are highest.',
       },
     ],
   },
@@ -76,5 +76,6 @@ export const SCREEN_ORDER = [
   'phase3',
   'phase3-reveal',
   'results',
+  'why-matters',
   'final',
 ];

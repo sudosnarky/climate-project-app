@@ -27,6 +27,10 @@ const config: Config = {
           '0%': { transform: 'translateX(-50px)', opacity: '0' },
           '100%': { transform: 'translateX(0)', opacity: '1' },
         },
+        fadeSlideUp: {
+          '0%': { transform: 'translateY(16px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
         barFill: {
           '0%': { width: '0%' },
           '100%': { width: 'var(--bar-width)' },
@@ -36,6 +40,7 @@ const config: Config = {
         fadeIn: 'fadeIn 0.3s ease-in-out',
         slideUp: 'slideUp 0.4s ease-out',
         slideInLeft: 'slideInLeft 0.3s ease-out',
+        fadeSlideUp: 'fadeSlideUp 0.45s ease-out',
         barFill: 'barFill 0.6s ease-out forwards',
       },
     },

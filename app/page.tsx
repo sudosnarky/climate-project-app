@@ -7,6 +7,7 @@ import ProgressBar from '@/components/ProgressBar';
 import ExperimentPhaseComponent from '@/components/ExperimentPhase';
 import ResultReveal from '@/components/ResultReveal';
 import DataVisualization from '@/components/DataVisualization';
+import WhyThisMatters from '@/components/WhyThisMatters';
 import FinalScreen from '@/components/FinalScreen';
 import { AppState, UserResponse, AllPhaseResults } from '@/lib/types';
 import { PHASES, SCREEN_ORDER } from '@/lib/data';
@@ -14,38 +15,41 @@ import { addResponse, subscribeToResults } from '@/lib/firebase';
 
 const STORAGE_KEY = 'climate-experiment-v1';
 
-export default function Home() {
-  const [appState, setAppState] = useState<AppState | null>(null);
-  const [liveResults, setLiveResults] = useState<AllPhaseResults>({});
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [unsubscribe, setUnsubscribe] = useState<(() => void) | null>(null);
+function createNewSession(): AppState {
+  return {
+    currentScreen: 'landing',
+    userResponses: [],
+    sessionId: uuidv4(),
+    startTime: Date.now(),
+  };
+}
 
-  // Initialize state from localStorage or create new session
-  useEffect(() => {
+export default function Home() {
+  const [appState, setAppState] = useState<AppState>(() => {
+    if (typeof window === 'undefined') {
+      return createNewSession();
+    }
+
     const stored = localStorage.getItem(STORAGE_KEY);
 
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored) as AppState;
-        setAppState(parsed);
-      } catch {
-        // Invalid stored data, create new session
-        const newSession = createNewSession();
-        setAppState(newSession);
-      }
-    } else {
-      const newSession = createNewSession();
-      setAppState(newSession);
+    if (!stored) {
+      return createNewSession();
     }
-  }, []);
+
+    try {
+      return JSON.parse(stored) as AppState;
+    } catch {
+      return createNewSession();
+    }
+  });
+  const [liveResults, setLiveResults] = useState<AllPhaseResults>({});
+  const [isProcessing, setIsProcessing] = useState(false);
 
   // Subscribe to Firebase real-time updates
   useEffect(() => {
     const unsubscribeFn = subscribeToResults((results) => {
       setLiveResults(results);
     });
-
-    setUnsubscribe(() => unsubscribeFn);
 
     return () => {
       unsubscribeFn();
@@ -60,22 +64,9 @@ export default function Home() {
   }, [appState]);
 
   /**
-   * Create a brand new experiment session
-   */
-  function createNewSession(): AppState {
-    return {
-      currentScreen: 'landing',
-      userResponses: [],
-      sessionId: uuidv4(),
-      startTime: Date.now(),
-    };
-  }
-
-  /**
    * Get current step number for progress bar
    */
   const getProgressStep = useCallback((): number => {
-    if (!appState) return 0;
     const screenIndex = SCREEN_ORDER.indexOf(appState.currentScreen);
     return screenIndex >= 0 ? screenIndex + 1 : 1;
   }, [appState]);
@@ -84,12 +75,10 @@ export default function Home() {
    * Navigate to next screen
    */
   const goToNextScreen = useCallback(() => {
-    if (!appState) return;
-
     const currentIndex = SCREEN_ORDER.indexOf(appState.currentScreen);
     if (currentIndex < SCREEN_ORDER.length - 1) {
       const nextScreen = SCREEN_ORDER[currentIndex + 1] as AppState['currentScreen'];
-      setAppState((prev) => prev ? { ...prev, currentScreen: nextScreen } : null);
+      setAppState((prev) => ({ ...prev, currentScreen: nextScreen }));
     }
   }, [appState]);
 
@@ -98,8 +87,6 @@ export default function Home() {
    */
   const handlePhaseSelect = useCallback(
     async (phaseId: string, optionIndex: number) => {
-      if (!appState) return;
-
       setIsProcessing(true);
 
       const phase = PHASES.find((p) => p.id === phaseId);
@@ -121,9 +108,7 @@ export default function Home() {
 
         // Add to local state
         const updatedResponses = [...appState.userResponses, response];
-        setAppState((prev) =>
-          prev ? { ...prev, userResponses: updatedResponses } : null
-        );
+        setAppState((prev) => ({ ...prev, userResponses: updatedResponses }));
 
         // Send to Firebase
         await addResponse(response);
@@ -141,25 +126,8 @@ export default function Home() {
     [appState, goToNextScreen]
   );
 
-  /**
-   * Restart the experiment
-   */
-  const restart = useCallback(() => {
-    const newSession = createNewSession();
-    setAppState(newSession);
-  }, []);
-
   if (!appState) {
-    return (
-      <div className="min-h-screen w-full flex items-center justify-center bg-black">
-        <div className="text-center">
-          <div className="inline-block animate-spin">
-            <div className="h-8 w-8 border-4 border-neon-green border-t-neon-cyan rounded-full"></div>
-          </div>
-          <p className="mt-4 text-neon-cyan font-mono text-sm">Initializing experiment...</p>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   // Show progress bar on all screens except landing and final
@@ -232,8 +200,12 @@ export default function Home() {
         <DataVisualization results={liveResults} onComplete={goToNextScreen} />
       )}
 
+      {appState.currentScreen === 'why-matters' && (
+        <WhyThisMatters onContinue={goToNextScreen} />
+      )}
+
       {appState.currentScreen === 'final' && (
-        <FinalScreen onRestart={restart} />
+        <FinalScreen />
       )}
     </main>
   );

@@ -18,7 +18,7 @@ export default function DataVisualization({
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-black px-6 pt-20 pb-12">
-      <div className="max-w-3xl w-full animate-fadeIn">
+      <div className="max-w-3xl w-full animate-fadeSlideUp">
         {/* Header */}
         <div className="mb-12 text-center">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-3">
@@ -26,7 +26,7 @@ export default function DataVisualization({
             <span className="text-neon-green">Responded</span>
           </h2>
           <p className="text-gray-400 text-lg">
-            Live data from all experiment participants
+            Live response patterns observed across participants globally
           </p>
         </div>
 
@@ -51,7 +51,7 @@ export default function DataVisualization({
                     {phaseDesc?.title}
                   </h3>
                   <p className="text-sm text-gray-500 mt-1">
-                    {result.totalResponses} total responses
+                    {result.totalResponses} recorded responses
                   </p>
                 </div>
 
@@ -96,7 +96,7 @@ export default function DataVisualization({
           onClick={onComplete}
           className="w-full px-8 py-4 bg-neon-green text-black font-bold text-lg rounded-lg hover:bg-neon-cyan transition-all duration-200 active:scale-95 focus:outline-none focus:ring-2 focus:ring-neon-green focus:ring-offset-2 focus:ring-offset-black"
         >
-          See Final Insight
+          Continue to Meta Insight
         </button>
       </div>
     </div>

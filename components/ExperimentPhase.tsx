@@ -25,7 +25,7 @@ export default function ExperimentPhaseComponent({
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-black px-6 pt-20 pb-8">
-      <div className="max-w-2xl w-full animate-slideInLeft">
+      <div className="max-w-2xl w-full animate-fadeSlideUp">
         {/* Phase Indicator */}
         <div className="mb-8">
           <p className="text-sm font-mono text-neon-cyan uppercase tracking-wider">
@@ -37,11 +37,13 @@ export default function ExperimentPhaseComponent({
         </div>
 
         {/* Description */}
-        {phase.description && (
-          <p className="text-xl text-gray-300 mb-12 leading-relaxed">
-            {phase.description}
-          </p>
-        )}
+        <div className="min-h-16 mb-12">
+          {phase.description && (
+            <p className="text-xl text-gray-300 leading-relaxed">
+              {phase.description}
+            </p>
+          )}
+        </div>
 
         {/* Options */}
         <div
@@ -103,8 +105,8 @@ export default function ExperimentPhaseComponent({
           {disabled
             ? 'Saving your response...'
             : selectedIndex === null
-              ? 'Select one option to continue'
-              : 'Answer selected. Click Next to continue'}
+              ? 'Select one response to continue'
+              : 'Response recorded. Click Next to continue'}
         </p>
       </div>
     </div>
