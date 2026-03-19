@@ -1,6 +1,6 @@
 'use client';
 
-import { initializeApp } from 'firebase/app';
+import { FirebaseApp, initializeApp } from 'firebase/app';
 import {
   getDatabase,
   Database,
@@ -23,12 +23,38 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-let app: ReturnType<typeof initializeApp>;
-let db: Database;
+let app: FirebaseApp | null = null;
+let db: Database | null = null;
+
+const hasFirebaseConfig = Boolean(
+  firebaseConfig.apiKey &&
+    firebaseConfig.authDomain &&
+    firebaseConfig.databaseURL &&
+    firebaseConfig.projectId &&
+    firebaseConfig.appId
+);
+
+const createEmptyResults = (): AllPhaseResults => {
+  const emptyResults: AllPhaseResults = {};
+
+  PHASES.forEach((phase) => {
+    emptyResults[phase.id] = {
+      phaseId: phase.id,
+      optionCounts: phase.options.map(() => 0),
+      optionLabels: phase.options.map((option) => option.label),
+      percentages: phase.options.map(() => 0),
+      totalResponses: 0,
+    };
+  });
+
+  return emptyResults;
+};
 
 try {
-  app = initializeApp(firebaseConfig);
-  db = getDatabase(app);
+  if (hasFirebaseConfig) {
+    app = initializeApp(firebaseConfig);
+    db = getDatabase(app);
+  }
 } catch (error) {
   console.error('Firebase initialization error:', error);
 }
@@ -38,6 +64,10 @@ try {
  */
 export const addResponse = async (response: UserResponse): Promise<void> => {
   try {
+    if (!db) {
+      return;
+    }
+
     const responsesRef = ref(db, 'responses');
     await push(responsesRef, {
       phaseId: response.phaseId,
@@ -59,22 +89,19 @@ export const subscribeToResults = (
   callback: (results: AllPhaseResults) => void
 ): Unsubscribe => {
   try {
+    const emptyResults = createEmptyResults();
+
+    if (!db) {
+      callback(emptyResults);
+      return () => {};
+    }
+
     const responsesRef = ref(db, 'responses');
     return onValue(responsesRef, (snapshot) => {
       const data = snapshot.val();
-      const results: AllPhaseResults = {};
+      const results = createEmptyResults();
 
       // Always initialize every phase and option so the UI shows all bars.
-      PHASES.forEach((phase) => {
-        results[phase.id] = {
-          phaseId: phase.id,
-          optionCounts: phase.options.map(() => 0),
-          optionLabels: phase.options.map((option) => option.label),
-          percentages: phase.options.map(() => 0),
-          totalResponses: 0,
-        };
-      });
-
       if (data) {
         // Transform flat response list into aggregated results by phase
         Object.values(data as Record<string, Record<string, unknown>>).forEach((response: Record<string, unknown>) => {

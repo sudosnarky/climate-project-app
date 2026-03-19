@@ -32,7 +32,7 @@ export default function Landing({ onBegin }: LandingProps) {
         </button>
 
         <p className="text-xs text-gray-600 mt-8">
-          ~2 minutes • Anonymous responses only • No personal data collected
+          ~3 minutes • Anonymous responses only • No personal data collected
         </p>
       </div>
     </div>

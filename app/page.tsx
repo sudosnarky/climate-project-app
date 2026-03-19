@@ -26,25 +26,25 @@ function createNewSession(): AppState {
 }
 
 export default function Home() {
-  const [appState, setAppState] = useState<AppState>(() => {
-    if (typeof window === 'undefined') {
-      return createNewSession();
-    }
-
-    const stored = localStorage.getItem(STORAGE_KEY);
-
-    if (!stored) {
-      return createNewSession();
-    }
-
-    try {
-      return JSON.parse(stored) as AppState;
-    } catch {
-      return createNewSession();
-    }
-  });
+  const [appState, setAppState] = useState<AppState>(createNewSession);
+  const [isHydrated, setIsHydrated] = useState(false);
   const [liveResults, setLiveResults] = useState<AllPhaseResults>({});
   const [isProcessing, setIsProcessing] = useState(false);
+
+  // Restore local session only after mount to avoid SSR/CSR markup mismatch.
+  useEffect(() => {
+    const stored = localStorage.getItem(STORAGE_KEY);
+
+    if (stored) {
+      try {
+        setAppState(JSON.parse(stored) as AppState);
+      } catch {
+        setAppState(createNewSession());
+      }
+    }
+
+    setIsHydrated(true);
+  }, []);
 
   // Subscribe to Firebase real-time updates
   useEffect(() => {
@@ -59,10 +59,12 @@ export default function Home() {
 
   // Persist state to localStorage
   useEffect(() => {
-    if (appState) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+    if (!isHydrated) {
+      return;
     }
-  }, [appState]);
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+  }, [appState, isHydrated]);
 
   /**
    * Get current step number for progress bar
@@ -131,72 +133,71 @@ export default function Home() {
     setAppState((prev) => ({ ...prev, currentScreen: 'thank-you' }));
   }, []);
 
-  if (!appState) {
+  const getCurrentPhaseMeta = useCallback(() => {
+    const phaseScreenMatch = appState.currentScreen.match(/^phase(\d+)(-reveal)?$/);
+    if (!phaseScreenMatch) {
+      return null;
+    }
+
+    const phaseNumber = Number(phaseScreenMatch[1]);
+    const phaseIndex = phaseNumber - 1;
+    const isReveal = Boolean(phaseScreenMatch[2]);
+    const phase = PHASES[phaseIndex];
+
+    if (!phase) {
+      return null;
+    }
+
+    const selectedResponse = appState.userResponses.find(
+      (response) => response.phaseId === phase.id
+    );
+
+    return {
+      phase,
+      phaseNumber,
+      isReveal,
+      selectedIndex: selectedResponse?.selectedOptionIndex ?? 0,
+    };
+  }, [appState.currentScreen, appState.userResponses]);
+
+  if (!isHydrated || !appState) {
     return null;
   }
 
   // Show progress bar on all screens except landing and final
   const showProgress = !['landing', 'final', 'thank-you'].includes(appState.currentScreen);
   const progressStep = getProgressStep();
+  const currentPhaseMeta = getCurrentPhaseMeta();
 
   // Render current screen
   return (
     <main className="w-full min-h-screen bg-black text-white overflow-hidden">
       {showProgress && (
-        <ProgressBar currentStep={progressStep} totalSteps={SCREEN_ORDER.length} />
+        <ProgressBar
+          currentStep={progressStep}
+          totalSteps={SCREEN_ORDER.length}
+          currentScreen={appState.currentScreen}
+        />
       )}
 
       {appState.currentScreen === 'landing' && (
         <Landing onBegin={goToNextScreen} />
       )}
 
-      {appState.currentScreen === 'phase1' && (
+      {currentPhaseMeta && !currentPhaseMeta.isReveal && (
         <ExperimentPhaseComponent
-          phase={PHASES[0]}
-          onNext={(index) => handlePhaseSelect('phase1', index)}
+          phase={currentPhaseMeta.phase}
+          onNext={(index) => handlePhaseSelect(currentPhaseMeta.phase.id, index)}
           disabled={isProcessing}
-          stepNumber={1}
+          stepNumber={currentPhaseMeta.phaseNumber}
+          totalPhases={PHASES.length}
         />
       )}
 
-      {appState.currentScreen === 'phase1-reveal' && (
+      {currentPhaseMeta && currentPhaseMeta.isReveal && (
         <ResultReveal
-          phase={PHASES[0]}
-          selectedIndex={appState.userResponses[0]?.selectedOptionIndex ?? 0}
-          onContinue={goToNextScreen}
-        />
-      )}
-
-      {appState.currentScreen === 'phase2' && (
-        <ExperimentPhaseComponent
-          phase={PHASES[1]}
-          onNext={(index) => handlePhaseSelect('phase2', index)}
-          disabled={isProcessing}
-          stepNumber={2}
-        />
-      )}
-
-      {appState.currentScreen === 'phase2-reveal' && (
-        <ResultReveal
-          phase={PHASES[1]}
-          selectedIndex={appState.userResponses[1]?.selectedOptionIndex ?? 0}
-          onContinue={goToNextScreen}
-        />
-      )}
-
-      {appState.currentScreen === 'phase3' && (
-        <ExperimentPhaseComponent
-          phase={PHASES[2]}
-          onNext={(index) => handlePhaseSelect('phase3', index)}
-          disabled={isProcessing}
-          stepNumber={3}
-        />
-      )}
-
-      {appState.currentScreen === 'phase3-reveal' && (
-        <ResultReveal
-          phase={PHASES[2]}
-          selectedIndex={appState.userResponses[2]?.selectedOptionIndex ?? 0}
+          phase={currentPhaseMeta.phase}
+          selectedIndex={currentPhaseMeta.selectedIndex}
           onContinue={goToNextScreen}
         />
       )}

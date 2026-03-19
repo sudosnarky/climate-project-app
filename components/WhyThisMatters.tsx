@@ -17,7 +17,7 @@ export default function WhyThisMatters({ onContinue }: WhyThisMattersProps) {
             Climate change persists not only because of missing information.
           </p>
           <p className="text-lg text-gray-200 leading-relaxed">
-            It persists because predictable cognitive biases shape perception, responsibility, and urgency.
+            It persists because predictable cognitive biases shape time preference, risk salience, responsibility, personal vulnerability, and action scope.
           </p>
           <p className="text-lg text-gray-200 leading-relaxed">
             Policies and awareness campaigns fail when they assume purely rational decision-making.

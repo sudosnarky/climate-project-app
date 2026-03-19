@@ -3,11 +3,21 @@
 interface ProgressBarProps {
   currentStep: number;
   totalSteps: number;
+  currentScreen: string;
 }
 
-export default function ProgressBar({ currentStep, totalSteps }: ProgressBarProps) {
+const STAGE_LABELS = ['Time', 'Risk', 'Responsibility', 'Personal Risk', 'Action'];
+
+export default function ProgressBar({
+  currentStep,
+  totalSteps,
+  currentScreen,
+}: ProgressBarProps) {
   const percentage = (currentStep / totalSteps) * 100;
-  const stage = currentStep <= 3 ? 'Perception' : currentStep <= 5 ? 'Risk' : 'Responsibility';
+  const phaseMatch = currentScreen.match(/^phase(\d+)(-reveal)?$/);
+  const phaseIndex = phaseMatch ? Number(phaseMatch[1]) - 1 : STAGE_LABELS.length - 1;
+  const boundedIndex = Math.min(Math.max(phaseIndex, 0), STAGE_LABELS.length - 1);
+  const stage = STAGE_LABELS[boundedIndex];
 
   return (
     <div className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-sm border-b border-gray-900">

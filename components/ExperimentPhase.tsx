@@ -8,6 +8,7 @@ interface ExperimentPhaseProps {
   onNext: (optionIndex: number) => void;
   disabled: boolean;
   stepNumber: number;
+  totalPhases: number;
 }
 
 export default function ExperimentPhaseComponent({
@@ -15,6 +16,7 @@ export default function ExperimentPhaseComponent({
   onNext,
   disabled,
   stepNumber,
+  totalPhases,
 }: ExperimentPhaseProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
@@ -29,7 +31,7 @@ export default function ExperimentPhaseComponent({
         {/* Phase Indicator */}
         <div className="mb-8">
           <p className="text-sm font-mono text-neon-cyan uppercase tracking-wider">
-            Phase {stepNumber} of 3
+            Phase {stepNumber} of {totalPhases}
           </p>
           <h2 className="text-4xl md:text-5xl font-bold text-white mt-2">
             {phase.question}

@@ -26,7 +26,7 @@ export default function DataVisualization({
             <span className="text-neon-green">Responded</span>
           </h2>
           <p className="text-gray-400 text-lg">
-            Live response patterns observed across participants globally
+            Live response patterns across {PHASES.length} climate decisions
           </p>
         </div>
 
@@ -48,7 +48,8 @@ export default function DataVisualization({
                 {/* Phase Title */}
                 <div className="mb-6">
                   <h3 className="text-xl md:text-2xl font-bold text-white">
-                    {phaseDesc?.title}
+                    <span className="mr-2" aria-hidden="true">{phaseDesc?.icon ?? '•'}</span>
+                    {phaseDesc?.title ?? phase.question}
                   </h3>
                   <p className="text-sm text-gray-500 mt-1">
                     {result.totalResponses} recorded responses
